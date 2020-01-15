@@ -41,6 +41,7 @@ def parse_args():
     p.add('--ctr-branch', default="master")
     p.add('--sdn-repo', default="http://github.com/microsoft/windows-container-networking")
     p.add('--sdn-branch', default="master")
+    p.add('--prepull-yaml', default="https://raw.githubusercontent.com/kubernetes-sigs/windows-testing/master/gce/prepull.yaml")
     p.add('--hold', type=str2bool, default=False, help='Useful for debugging while running in containerd. \
                                                         Sleeps the process after setting the env for testing so user can manually exec from container.')
 
