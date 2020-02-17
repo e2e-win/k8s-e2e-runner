@@ -128,7 +128,12 @@ def get_ctr_folder():
     return os.path.join(gopath, "src", "github.com", "containerd", "containerd")
 
 
-def get_sdn_folder():
+def get_cnp_folder():
+    gopath = get_go_path()
+    return os.path.join(gopath, "src", "github.com", "containernetworking", "plugins")
+
+
+def get_wcn_folder():
     gopath = get_go_path()
     return os.path.join(gopath, "src", "github.com", "Microsoft", "windows-container-networking")
 
@@ -198,21 +203,43 @@ def build_containerd_shim(containerd_shim_path=None, fromVendor=False):
     shutil.copy(containerd_shim_bin, get_bins_path())
 
 
-def build_sdn_binaries(sdn_path=None):
-    sdn_path = sdn_path if sdn_path else get_sdn_folder()
-    logging.info("Build sdn binaries")
-    cmd = ["GOOS=windows", "make", "all"]
+def build_cnp_binaries(cnp_path=None):
+    logging.info("Building containernetworking plugin binaries")
 
-    _, err, ret = run_cmd(cmd, stderr=True, cwd=sdn_path, shell=True)
+    cnp_path = cnp_path if cnp_path else get_cnp_folder()
+    cmd = ["./build_windows.sh"]
+    cnp_bins_location = os.path.join(cnp_path, constants.CNP_BINS_LOCATION)
+
+    _, err, ret = run_cmd(cmd, stderr=True, cwd=cnp_path, shell=True)
 
     if ret != 0:
-        logging.error("Failed to build sdn windows binaries with error: %s" % err)
-        raise Exception("Failed to build sdn windows binaries with error: %s" % err)
+        logging.error("Failed to build containernetworking plugin binaries with error: %s" % err)
+        raise Exception("Failed to build containernetworking plugin binaries with error: %s" % err)
 
-    logging.info("Successfuly built sdn binaries.")
-    logging.info("Copying built bins to central location")
-    sdn_bins_location = os.path.join(sdn_path, constants.SDN_BINS_LOCATION)
-    for path in glob.glob("%s/*" % sdn_bins_location):
+    logging.info("Successfuly built containernetworking plugin binaries.")
+    logging.info("Copying built containernetworking plugin binaries to central location")
+
+    for path in glob.glob("%s/*" % cnp_bins_location):
+        shutil.copy(path, get_bins_path())
+
+
+def build_wcn_binaries(wcn_path=None):
+    logging.info("Building windows container networking binaries")
+
+    wcn_path = wcn_path if wcn_path else get_wcn_folder()
+    cmd = ["GOOS=windows", "make", "all"]
+    wcn_bins_location = os.path.join(wcn_path, constants.WCN_BINS_LOCATION)
+
+    _, err, ret = run_cmd(cmd, stderr=True, cwd=wcn_path, shell=True)
+
+    if ret != 0:
+        logging.error("Failed to build windows container networking binaries with error: %s" % err)
+        raise Exception("Failed to build windows container networking binaries with error: %s" % err)
+
+    logging.info("Successfuly built windows container networking binaries.")
+    logging.info("Copying built windows container networking binaries to central location")
+
+    for path in glob.glob("%s/*" % wcn_bins_location):
         shutil.copy(path, get_bins_path())
 
 
