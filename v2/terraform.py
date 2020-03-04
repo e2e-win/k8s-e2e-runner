@@ -64,7 +64,7 @@ class TerraformProvisioner(deployer.NoopDeployer):
                                   vms=[])
         for index in range(cluster["win_vms"]["win_vm_count"]):
             vm_name = self.opts.win_minion_name_prefix + str(index)
-            cluster["win_vms"]["vms"].append(dict(vm_name=vm_name, public_ip=None))
+            cluster["win_vms"]["vms"].append(dict(vm_name=vm_name))
 
         return cluster
 
@@ -92,10 +92,15 @@ class TerraformProvisioner(deployer.NoopDeployer):
     def _set_cluster_master_vm_public_ip(self, master_public_ip):
         self.cluster["master_vm"]["public_ip"] = master_public_ip
 
-    def _set_cluster_win_min_public_ip(self, vm_name, vm_public_ip):
+    def get_cluster_min_private_ip(self, vm_name):
         for vm in self.cluster["win_vms"]["vms"]:
             if vm["vm_name"] == vm_name:
-                vm["public_ip"] = vm_public_ip
+                return vm["private_ip"]
+
+    def _set_cluster_win_min_private_ip(self, vm_name, vm_private_ip):
+        for vm in self.cluster["win_vms"]["vms"]:
+            if vm["vm_name"] == vm_name:
+                vm["private_ip"] = vm_private_ip
 
     def get_cluster_master_vm_size(self):
         return self.cluster["master_vm"]["vm_size"]
@@ -156,6 +161,9 @@ class TerraformProvisioner(deployer.NoopDeployer):
 
     def get_win_vm_username(self):
         return constants.WINDOWS_ADMIN_USER
+
+    def get_win_vm_port(self, vm_name):
+        return constants.tunnel_ports[vm_name]
 
     def get_master_username(self):
         return constants.WINDOWS_ADMIN_USER
@@ -273,8 +281,8 @@ class TerraformProvisioner(deployer.NoopDeployer):
     def _parse_terraform_output(self, output):
         master_ip = output["master"]["value"][self.get_cluster_master_vm_name()]
         self._set_cluster_master_vm_public_ip(master_ip)
-        for vm_name, vm_pub_ip in output["winMinions"]["value"].items():
-            self._set_cluster_win_min_public_ip(vm_name, vm_pub_ip)
+        for vm_name, vm_prv_ip in output["privateips"]["value"].items():
+            self._set_cluster_win_min_private_ip(vm_name, vm_prv_ip)
 
         print json.dumps(self.cluster)
 
@@ -286,15 +294,6 @@ class TerraformProvisioner(deployer.NoopDeployer):
             hosts_entry = ("%s %s\n" % (vm_public_ip, vm_name))
             self.logging.info("Adding entry '%s' to hosts file." % hosts_entry.rstrip("\n"))
             f.write(hosts_entry)
-
-            for vm in self.get_cluster_win_minion_vms():
-                vm_name = vm["vm_name"]
-                vm_public_ip = vm["public_ip"]
-                if vm_name.find("master") > 0:
-                    vm_name = vm_name + " kubernetes"
-                hosts_entry = ("%s %s\n" % (vm_public_ip, vm_name))
-                self.logging.info("Adding entry '%s' to hosts file." % hosts_entry.rstrip("\n"))
-                f.write(hosts_entry)
 
     def up(self):
         self.logging.info("Terraform up.")

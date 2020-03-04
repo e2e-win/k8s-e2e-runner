@@ -28,7 +28,7 @@ class Terraform_Flannel(ci.CI):
                               "[kube-minions-windows]\nKUBE_MINIONS_WINDOWS_PLACEHOLDER\n")
     ANSIBLE_HOSTS_PATH = "%s/inventory/hosts" % ANSIBLE_PLAYBOOK_ROOT
     DEFAULT_ANSIBLE_WINDOWS_ADMIN = "Admin"
-    DEFAULT_ANSIBLE_HOST_VAR_WINDOWS_TEMPLATE = 'ansible_user: "USERNAME_PLACEHOLDER"\nansible_password: "PASS_PLACEHOLDER"\nansible_winrm_read_timeout_sec: 240\n'
+    DEFAULT_ANSIBLE_HOST_VAR_WINDOWS_TEMPLATE = 'ansible_user: "USERNAME_PLACEHOLDER"\nansible_password: "PASS_PLACEHOLDER"\nansible_host: 127.0.0.1\nansible_port: PORT_PLACEHOLDER\nansible_winrm_read_timeout_sec: 240\n'
     DEFAULT_ANSIBLE_HOST_VAR_DIR = "%s/inventory/host_vars" % ANSIBLE_PLAYBOOK_ROOT
     DEFAULT_GROUP_VARS_PATH = "%s/inventory/group_vars/all" % ANSIBLE_PLAYBOOK_ROOT
     HOSTS_FILE = "/etc/hosts"
@@ -109,6 +109,13 @@ class Terraform_Flannel(ci.CI):
         with open(Terraform_Flannel.AZURE_CCM_LOCAL_PATH, "w") as f:
             f.write(json.dumps(azure_config))
 
+    def _open_winrm_tunnels(self):
+        windows_minions_hostnames = self.deployer.get_cluster_win_minion_vms_names()
+        for vm_name in windows_minions_hostnames:
+            vm_ip = self.deployer.get_cluster_min_private_ip(vm_name)
+            port = self.deployer.get_win_vm_port(vm_name)
+            utils.open_winrm_tunnel(vm_ip, port, self.opts.ssh_private_key_path)
+
     def _prepare_ansible(self):
         utils.clone_repo(self.opts.ansibleRepo, self.opts.ansibleBranch, self.default_ansible_path)
 
@@ -132,7 +139,8 @@ class Terraform_Flannel(ci.CI):
         for vm_name in windows_minions_hostnames:
             vm_username = self.deployer.get_win_vm_username()
             vm_pass = self.deployer.get_win_vm_password()
-            hosts_var_content = self.ansible_host_var_windows_template.replace("USERNAME_PLACEHOLDER", vm_username).replace("PASS_PLACEHOLDER", vm_pass)
+            vm_port = self.deployer.get_win_vm_port(vm_name)
+            hosts_var_content = self.ansible_host_var_windows_template.replace("USERNAME_PLACEHOLDER", vm_username).replace("PASS_PLACEHOLDER", vm_pass).replace("PORT_PLACEHOLDER", vm_port)
             filepath = os.path.join(self.ansible_host_var_dir, vm_name)
             with open(filepath, "w") as f:
                 f.write(hosts_var_content)
@@ -438,6 +446,7 @@ class Terraform_Flannel(ci.CI):
         self.logging.info("Bringing cluster up.")
         try:
             self.deployer.up()
+            self._open_winrm_tunnels()
             self._prepare_ansible()
             self._add_ssh_key()
             if self.patches is not None:

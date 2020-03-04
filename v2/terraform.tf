@@ -163,15 +163,6 @@ resource "azurerm_virtual_machine" "masterVM" {
 # Minion Windows VM Config
 ###### 
 
-# Create public IPs
-resource "azurerm_public_ip" "winMinionPublicIP" {
-  count               = "${var.win_minion_count}"
-  name                = "winMinPubIP-${count.index}"
-  location            = "${var.location}"
-  resource_group_name = "${azurerm_resource_group.clusterRg.name}"
-  allocation_method   = "Dynamic"
-}
-
 # Create Network Security Group and rule
 resource "azurerm_network_security_group" "winNSG" {
   name                = "winMinionNSG"
@@ -216,7 +207,6 @@ resource "azurerm_network_interface" "winMinNic" {
     name                          = "winMinNicConfig-${count.index}"
     subnet_id                     = "${azurerm_subnet.clusterSubnet.id}"
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = "${element(azurerm_public_ip.winMinionPublicIP.*.id, count.index)}"
   }
 }
 
@@ -279,17 +269,11 @@ data "azurerm_public_ip" "masterPublicIP" {
   resource_group_name = "${azurerm_resource_group.clusterRg.name}"
 }
 
-data "azurerm_public_ip" "winMinionPublicIP" {
-  count               = "${var.win_minion_count}"
-  depends_on          = ["azurerm_virtual_machine.winMinionVM"]
-  name                = "winMinPubIP-${count.index}"
-  resource_group_name = "${azurerm_resource_group.clusterRg.name}"
-}
-
 output "master" {
   value = "${map(azurerm_virtual_machine.masterVM.name, data.azurerm_public_ip.masterPublicIP.ip_address)}"
 }
 
-output "winMinions" {
-  value = "${zipmap(azurerm_virtual_machine.winMinionVM.*.name, data.azurerm_public_ip.winMinionPublicIP.*.ip_address)}"
+output "privateips" {
+  value = "${zipmap(azurerm_virtual_machine.winMinionVM.*.name, azurerm_network_interface.winMinNic.*.private_ip_address)}"
+  depends_on = ["azurerm_network_interface.winMinNic"]
 }

@@ -284,6 +284,17 @@ def get_kubectl_bin():
         return os.path.join(get_k8s_folder(), "cluster/kubectl.sh")
 
 
+def open_winrm_tunnel(vm_ip, local_port, ssh_key):
+    logging.info("Opening WinRM tunnel to: %s" % vm_ip)
+    cmd = ["ssh", "-fNT", "-L", "%s:%s:5986" % (local_port, vm_ip), "-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null", "-i", ssh_key, "ubuntu@test-master"]
+
+    out, err, ret = run_cmd(cmd, stdout=False, stderr=False, shell=False)
+
+    if ret != 0:
+        logging.error("Failed to open WinRM tunnel: %s" % err)
+        raise Exception("Failed to open WinRM tunnel: %s" % err)
+
+
 def wait_for_ready_pod(pod_name, timeout=300):
     logging.info("Waiting up to %d seconds for pod %s to be ready.", timeout, pod_name)
 

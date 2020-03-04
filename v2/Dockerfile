@@ -68,9 +68,6 @@ RUN wget -q https://releases.hashicorp.com/terraform/0.11.13/terraform_0.11.13_l
 
 RUN pip install azure
 
-# Needed for script which modifies containerd config
-RUN pip3 install toml
-
 WORKDIR /workspace
 ADD bootstrap.py  /workspace
 
