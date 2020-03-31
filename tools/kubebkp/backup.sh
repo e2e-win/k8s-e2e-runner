@@ -72,3 +72,17 @@ done
 
 rm "/tmp/${ARCHIVE_NAME}.key.enc"
 rm "/tmp/${ARCHIVE_NAME}.tar.gz.enc"
+
+# Cleanup old blobs
+ALL_BLOBS=$(az storage blob list --container-name "${AZURE_STORAGE_CONTAINER_PROW_BKP}" --account-key "${AZURE_STORAGE_ACCOUNT_KEY}")
+for blob in $(echo "${ALL_BLOBS}" | jq -r '.[] | .name + "," + .properties.lastModified'); do
+	BLOB_FILE=$(echo "${blob}" | cut -d, -f1)
+	BLOB_DATE=$(echo "${blob}" | cut -d, -f2)
+	BLOB_AGE=$(dateutils.ddiff -f "%d" "${BLOB_DATE}" now)
+
+	if [ -n "${BACKUP_KEEP_DAYS}" ] && [ "${BLOB_AGE}" -gt "${BACKUP_KEEP_DAYS}" ]; then
+		logmsg "Deleting blob ${BLOB_FILE} (age: ${BLOB_AGE}D)"
+		az storage blob delete --container-name "${AZURE_STORAGE_CONTAINER_PROW_BKP}" \
+			--account-key "${AZURE_STORAGE_ACCOUNT_KEY}" --name "${BLOB_FILE}"
+	fi
+done
