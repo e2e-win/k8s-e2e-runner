@@ -23,8 +23,6 @@ RUN apt-get update && \
 RUN pip install --upgrade \
 	crudini \
 	pip \
-	python-novaclient \
-	python-openstackclient \
 	setuptools
 
 # Install Ansible

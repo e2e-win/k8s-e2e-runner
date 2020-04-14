@@ -13,8 +13,8 @@ import glob
 
 p = configargparse.get_argument_parser()
 
-p.add("--ansibleRepo", default="http://github.com/e2e-win/flannel-kubernetes", help="Ansible Repository for ovn-ovs playbooks.")
-p.add("--ansibleBranch", default="master", help="Ansible Repository branch for ovn-ovs playbooks.")
+p.add("--ansibleRepo", default="http://github.com/e2e-win/flannel-kubernetes", help="Ansible Repository for playbooks.")
+p.add("--ansibleBranch", default="master", help="Ansible Repository branch for playbooks.")
 p.add("--flannelMode", default="overlay", help="Option: overlay or host-gw")
 p.add("--containerRuntime", default="docker", help="Container runtime to set in ansible: docker / containerd.")
 p.add("--remoteCmdRetries", type=int, default=5, help="Number of retries Ansible adhoc command should do.")

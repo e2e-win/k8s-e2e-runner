@@ -80,7 +80,6 @@ function Get-KubernetesLogs {
         [String] $Destination
     )
 
-    $ovnServices = @("kubelet", "ovn-kuberntes-node", "ovs-vswitchd", "ovn-controller", "ovsdb-server")
     $flannelServices = @("kubelet", "kube-proxy", "flanneld")
     $containerdServices = @("containerd")
 
