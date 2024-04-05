@@ -161,7 +161,7 @@ periodics:
         - --cluster-name=aks-e2e-ltsc2019
 
 - name: aks-e2e-ltsc2022-azurecni-1.26
-  cron: "0 4 * * *"
+  cron: "0 3 * * *"
   always_run: true
   labels:
     preset-github-readonly-token: "true"
@@ -184,7 +184,7 @@ periodics:
         - --cluster-name=aks-e2e-ltsc2022
 
 - name: aks-e2e-ltsc2019-azurecni-1.27
-  cron: "0 8 * * *"
+  cron: "0 6 * * *"
   always_run: true
   labels:
     preset-github-readonly-token: "true"
@@ -207,7 +207,7 @@ periodics:
         - --cluster-name=aks-e2e-ltsc2019
 
 - name: aks-e2e-ltsc2022-azurecni-1.27
-  cron: "0 12 * * *"
+  cron: "0 9 * * *"
   always_run: true
   labels:
     preset-github-readonly-token: "true"
@@ -230,7 +230,7 @@ periodics:
         - --cluster-name=aks-e2e-ltsc2022
 
 - name: aks-e2e-ltsc2019-azurecni-1.28
-  cron: "0 16 * * *"
+  cron: "0 12 * * *"
   always_run: true
   labels:
     preset-github-readonly-token: "true"
@@ -253,7 +253,7 @@ periodics:
         - --cluster-name=aks-e2e-ltsc2019
 
 - name: aks-e2e-ltsc2022-azurecni-1.28
-  cron: "0 20 * * *"
+  cron: "0 15 * * *"
   always_run: true
   labels:
     preset-github-readonly-token: "true"
@@ -272,5 +272,51 @@ periodics:
         - --e2e-bin=https://capzwin.blob.core.windows.net/bin/e2e.test-v1.28.4-e2e-patched
         - aks
         - --aks-version=1.28
+        - --win-agents-sku=Windows2022
+        - --cluster-name=aks-e2e-ltsc2022
+
+- name: aks-e2e-ltsc2019-azurecni-1.29
+  cron: "0 18 * * *"
+  always_run: true
+  labels:
+    preset-github-readonly-token: "true"
+    preset-ssh-key: "true"
+    preset-prod-azure-account: "true"
+    preset-windows-private-registry-cred: "true"
+  spec:
+    containers:
+    - image: ghcr.io/e2e-win/k8s-e2e-runner:main
+      imagePullPolicy: Always
+      command:
+        - /workspace/entrypoint.sh
+      args:
+        - --parallel-test-nodes=1
+        - --test-regex-file-url=https://raw.githubusercontent.com/e2e-win/k8s-e2e-runner/main/prow/test-regex/aks.yaml
+        - --e2e-bin=https://capzwin.blob.core.windows.net/bin/e2e.test-v1.29.2-e2e-patched
+        - aks
+        - --aks-version=1.29
+        - --win-agents-sku=Windows2019
+        - --cluster-name=aks-e2e-ltsc2019
+
+- name: aks-e2e-ltsc2022-azurecni-1.29
+  cron: "0 21 * * *"
+  always_run: true
+  labels:
+    preset-github-readonly-token: "true"
+    preset-ssh-key: "true"
+    preset-prod-azure-account: "true"
+    preset-windows-private-registry-cred: "true"
+  spec:
+    containers:
+    - image: ghcr.io/e2e-win/k8s-e2e-runner:main
+      imagePullPolicy: Always
+      command:
+        - /workspace/entrypoint.sh
+      args:
+        - --parallel-test-nodes=1
+        - --test-regex-file-url=https://raw.githubusercontent.com/e2e-win/k8s-e2e-runner/main/prow/test-regex/aks.yaml
+        - --e2e-bin=https://capzwin.blob.core.windows.net/bin/e2e.test-v1.29.2-e2e-patched
+        - aks
+        - --aks-version=1.29
         - --win-agents-sku=Windows2022
         - --cluster-name=aks-e2e-ltsc2022

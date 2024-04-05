@@ -323,6 +323,60 @@
                     "--cluster-name=aks-e2e-ltsc2022"
                 ]
             }
+        },
+        {
+            "name": "aks-e2e-ltsc2019-azurecni-1.29",
+            "type": "docker",
+            "request": "launch",
+            "preLaunchTask": "docker-run: debug",
+            "python": {
+                "pathMappings": [
+                    {
+                        "localRoot": "${workspaceFolder}/e2e-runner",
+                        "remoteRoot": "/app"
+                    }
+                ],
+                "projectType": "general",
+                "args": [
+                    "run",
+                    "ci",
+                    "--quiet",
+                    "--parallel-test-nodes=1",
+                    "--test-regex-file-url=https://raw.githubusercontent.com/e2e-win/k8s-e2e-runner/main/prow/test-regex/aks.yaml",
+                    "--e2e-bin=https://capzwin.blob.core.windows.net/bin/e2e.test-v1.29.2-e2e-patched",
+                    "aks",
+                    "--aks-version=1.29",
+                    "--win-agents-sku=Windows2019",
+                    "--cluster-name=aks-e2e-ltsc2019"
+                ]
+            }
+        },
+        {
+            "name": "aks-e2e-ltsc2022-azurecni-1.29",
+            "type": "docker",
+            "request": "launch",
+            "preLaunchTask": "docker-run: debug",
+            "python": {
+                "pathMappings": [
+                    {
+                        "localRoot": "${workspaceFolder}/e2e-runner",
+                        "remoteRoot": "/app"
+                    }
+                ],
+                "projectType": "general",
+                "args": [
+                    "run",
+                    "ci",
+                    "--quiet",
+                    "--parallel-test-nodes=1",
+                    "--test-regex-file-url=https://raw.githubusercontent.com/e2e-win/k8s-e2e-runner/main/prow/test-regex/aks.yaml",
+                    "--e2e-bin=https://capzwin.blob.core.windows.net/bin/e2e.test-v1.29.2-e2e-patched",
+                    "aks",
+                    "--aks-version=1.29",
+                    "--win-agents-sku=Windows2022",
+                    "--cluster-name=aks-e2e-ltsc2022"
+                ]
+            }
         }
     ]
 }
