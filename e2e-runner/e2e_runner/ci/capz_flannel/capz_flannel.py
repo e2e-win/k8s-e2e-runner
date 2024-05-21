@@ -844,18 +844,10 @@ class CapzFlannelCI(e2e_base.CI):
 
             kube_proxy_ver = node["status"]["nodeInfo"]["kubeProxyVersion"]
             # Deprecated KubeProxy Version Reporting: https://github.com/kubernetes/kubernetes/commit/98c29f0312190904f55d62a4b4820fc17119ec10 
-            parts = kube_proxy_ver.strip("v").split(".")
-            processed_version = int(''.join(parts[:2]))
-            if processed_version >= 131:
-                if kube_proxy_ver != "":
-                    raise e2e_exceptions.VersionMismatch(
-                        f"Wrong kube-proxy version on node {node_name}. "
-                        f"Expected {expected_ver}, but found {kube_proxy_ver}")
-            else:
-                if kube_proxy_ver != expected_ver:
-                    raise e2e_exceptions.VersionMismatch(
-                        f"Wrong kube-proxy version on node {node_name}. "
-                        f"Expected {expected_ver}, but found {kube_proxy_ver}")
+            if kube_proxy_ver != "" and kube_proxy_ver != expected_ver:
+                raise e2e_exceptions.VersionMismatch(
+                    f"Wrong kube-proxy version on node {node_name}. "
+                    f"Expected {expected_ver}, but found {kube_proxy_ver}")
 
     def _cleanup_capz_cluster(self):
         self._collect_bootstrap_vm_logs()
