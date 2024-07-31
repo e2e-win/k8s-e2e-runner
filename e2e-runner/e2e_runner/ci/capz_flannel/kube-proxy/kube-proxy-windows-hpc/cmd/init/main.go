@@ -29,7 +29,7 @@ func parseSourceVipFile() (string, error) {
 	if err := json.Unmarshal(bytes, &sourceVip); err != nil {
 		return "", err
 	}
-	return strings.Split(sourceVip.IP4.IP, "/")[0], nil
+	return strings.Split(sourceVip.IPS[0].Address, "/")[0], nil
 }
 
 func getSourceVip() (string, error) {
