@@ -4,6 +4,7 @@ AZURE_LOCATIONS = [
     "eastus",
     "eastus2",
     "northeurope",
+    "northcentralus",
     "southcentralus",
     "uksouth",
     "westeurope",
@@ -25,8 +26,8 @@ NETWORK_QUOTAS = [
     "RouteTables",
 ]
 
-DEFAULT_KUBERNETES_VERSION = "v1.28.10"
-DEFAULT_AKS_VERSION = "1.28"
+DEFAULT_KUBERNETES_VERSION = "v1.30.6"
+DEFAULT_AKS_VERSION = "1.30.6"
 
 FLANNEL_NAMESPACE = "kube-flannel"
 FLANNEL_HELM_REPO = "https://flannel-io.github.io/flannel"

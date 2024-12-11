@@ -103,16 +103,26 @@ class CapzFlannelCI(e2e_base.CI):
         return "ubuntu-2204-gen1"
 
     @property
-    def capz_images_windows_sku(self):
+    def os_version(self):
         if self.opts.win_os == "ltsc2019":
             os_version = 2019
         elif self.opts.win_os == "ltsc2022":
             os_version = 2022
+        elif self.opts.win_os == "ltsc2025":
+            os_version = 2025
         else:
             raise e2e_exceptions.InvalidOperatingSystem(
                 f"Unknown win_os: {self.opts.win_os}"
             )
-        return f"windows-{os_version}-containerd-gen1"
+        return os_version
+
+    @property
+    def capz_images_windows_name(self):
+        return f"windows-{self.os_version}-containerd-gen1"
+
+    @property
+    def capz_sig_windows_image_name(self):
+        return f"capi-win-{self.os_version}-containerd"
 
     @property
     def k8s_path(self):
@@ -529,9 +539,6 @@ class CapzFlannelCI(e2e_base.CI):
         capz_image_ubuntu_version = self._capz_image_latest_version(
             self.capz_images_linux_offer, self.capz_images_ubuntu_sku
         )
-        capz_image_windows_version = self._capz_image_latest_version(
-            self.capz_images_windows_offer, self.capz_images_windows_sku
-        )
         context = {
             "cluster_name": self.opts.cluster_name,
             "resource_group_tags": self.resource_group_tags,
@@ -566,11 +573,10 @@ class CapzFlannelCI(e2e_base.CI):
 
             "capz_image_publisher": self.capz_images_publisher,
             "capz_image_ubuntu_offer": self.capz_images_linux_offer,
-            "capz_image_windows_offer": self.capz_images_windows_offer,
             "capz_image_ubuntu_sku": self.capz_images_ubuntu_sku,
-            "capz_image_windows_sku": self.capz_images_windows_sku,
             "capz_image_ubuntu_version": capz_image_ubuntu_version,
-            "capz_image_windows_version": capz_image_windows_version,
+            "capz_sig_windows_image_name": self.capz_sig_windows_image_name,
+            "capz_sig_windows_image_version": self.opts.kubernetes_version
         }
         return context
 

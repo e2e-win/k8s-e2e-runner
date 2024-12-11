@@ -192,7 +192,7 @@ class RunCI(Command):
         p.add_argument(
             "--win-os",
             default="ltsc2022",
-            choices=["ltsc2019", "ltsc2022"],
+            choices=["ltsc2019", "ltsc2022", "ltsc2025"],
             help="The operating system of the K8s Windows agents.")
         p.add_argument(
             "--win-agent-size",

@@ -42,11 +42,10 @@ spec:
       enableIPForwarding: true
 {%- endif %}
       image:
-        marketplace:
-          publisher: {{ capz_image_publisher }}
-          offer: {{ capz_image_windows_offer }}
-          sku: {{ capz_image_windows_sku }}
-          version: {{ capz_image_windows_version }}
+        computeGallery:
+          name: {{ capz_sig_windows_image_name  }}
+          gallery: "ClusterAPI-f72ceb4f-5159-4c26-a0fe-2ea738f0d019"
+          version: {{ capz_sig_windows_image_version }}
 ---
 apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
 kind: KubeadmConfigTemplate

@@ -1,6 +1,66 @@
 {
     "configurations": [
         {
+            "name": "k8s-e2e-ltsc2025-containerd-flannel-sdnbridge-master",
+            "type": "docker",
+            "request": "launch",
+            "preLaunchTask": "docker-run: debug",
+            "python": {
+                "pathMappings": [
+                    {
+                        "localRoot": "${workspaceFolder}/e2e-runner",
+                        "remoteRoot": "/app"
+                    }
+                ],
+                "projectType": "general",
+                "args": [
+                    "run",
+                    "ci",
+                    "--quiet",
+                    "--test-regex-file-url=https://raw.githubusercontent.com/e2e-win/k8s-e2e-runner/main/prow/test-regex/capz_flannel.yaml",
+                    "--build=k8sbins",
+                    "--build=containerdbins",
+                    "--build=sdncnibins",
+                    "capz_flannel",
+                    "--cni-version=1.0.0",
+                    "--bootstrap-vm-size=Standard_D8s_v3",
+                    "--flannel-mode=host-gw",
+                    "--win-os=ltsc2025",
+                    "--cluster-name=capzctrd"
+                ]
+            }
+        },
+        {
+            "name": "k8s-e2e-ltsc2025-containerd-flannel-sdnoverlay-master",
+            "type": "docker",
+            "request": "launch",
+            "preLaunchTask": "docker-run: debug",
+            "python": {
+                "pathMappings": [
+                    {
+                        "localRoot": "${workspaceFolder}/e2e-runner",
+                        "remoteRoot": "/app"
+                    }
+                ],
+                "projectType": "general",
+                "args": [
+                    "run",
+                    "ci",
+                    "--quiet",
+                    "--test-regex-file-url=https://raw.githubusercontent.com/e2e-win/k8s-e2e-runner/main/prow/test-regex/capz_flannel.yaml",
+                    "--build=k8sbins",
+                    "--build=containerdbins",
+                    "--build=sdncnibins",
+                    "capz_flannel",
+                    "--cni-version=1.0.0",
+                    "--bootstrap-vm-size=Standard_D8s_v3",
+                    "--flannel-mode=vxlan",
+                    "--win-os=ltsc2025",
+                    "--cluster-name=capzctrd"
+                ]
+            }
+        },
+        {
             "name": "k8s-e2e-ltsc2022-containerd-flannel-sdnbridge-master",
             "type": "docker",
             "request": "launch",
