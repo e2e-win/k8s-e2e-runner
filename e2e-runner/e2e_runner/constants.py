@@ -1,14 +1,5 @@
 AZURE_LOCATIONS = [
-    "canadacentral",
-    "centralus",
-    "eastus",
-    "eastus2",
-    "northeurope",
-    "northcentralus",
-    "southcentralus",
-    "uksouth",
-    "westeurope",
-    "westus2",
+    "northcentralus"
 ]
 
 COMPUTE_QUOTAS = [

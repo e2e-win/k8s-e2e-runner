@@ -123,6 +123,14 @@ class CapzFlannelCI(e2e_base.CI):
     @property
     def capz_sig_windows_image_name(self):
         return f"capi-win-{self.os_version}-containerd"
+    
+    @property
+    def capz_sig_ubuntu_image_name(self):
+        return f"capi-ubun2-2404"
+
+    @property
+    def capz_sig_image_gallery(self):
+        return f"ClusterAPI-f72ceb4f-5159-4c26-a0fe-2ea738f0d019"
 
     @property
     def k8s_path(self):
@@ -537,7 +545,10 @@ class CapzFlannelCI(e2e_base.CI):
         ssh_public_key_b64 = base64.b64encode(
             self.ssh_public_key.encode()).decode()  # pyright: ignore
         capz_image_ubuntu_version = self._capz_image_latest_version(
-            self.capz_images_linux_offer, self.capz_images_ubuntu_sku
+            self.capz_sig_image_gallery, self.capz_sig_ubuntu_image_name
+        )
+        capz_image_windows_version = self._capz_image_latest_version(
+            self.capz_sig_image_gallery, self.capz_sig_windows_image_name
         )
         context = {
             "cluster_name": self.opts.cluster_name,
@@ -571,12 +582,11 @@ class CapzFlannelCI(e2e_base.CI):
             "containerd_bins": "containerdbins" in self.bins_built,
             "containerd_shim_bins": "containerdshim" in self.bins_built,
 
-            "capz_image_publisher": self.capz_images_publisher,
-            "capz_image_ubuntu_offer": self.capz_images_linux_offer,
-            "capz_image_ubuntu_sku": self.capz_images_ubuntu_sku,
-            "capz_image_ubuntu_version": capz_image_ubuntu_version,
+            "capz_sig_ubuntu_image_name": self.capz_sig_ubuntu_image_name,
+            "capz_sig_ubuntu_image_version": capz_image_ubuntu_version,
+
             "capz_sig_windows_image_name": self.capz_sig_windows_image_name,
-            "capz_sig_windows_image_version": self.opts.kubernetes_version
+            "capz_sig_windows_image_version": capz_image_windows_version
         }
         return context
 
@@ -586,16 +596,22 @@ class CapzFlannelCI(e2e_base.CI):
             ver = e2e_constants.DEFAULT_KUBERNETES_VERSION
         v = ver.strip("v").split(".")
         return f"{v[0]}{v[1]}.{v[2]}"
+    
+    def _capz_sig_gallery_version_prefix(self):
+        ver = self.kubernetes_version
+        if "k8sbins" in self.bins_built:
+            ver = e2e_constants.DEFAULT_KUBERNETES_VERSION
+        v = ver.strip("v").split(".")
+        return f"{v[0]}.{v[1]}"
 
-    def _capz_image_latest_version(self, offer, sku):
+    def _capz_image_latest_version(self, gallery_name, image_name):
         img_vers = e2e_utils.retry_on_error()(
-            self.compute_client.virtual_machine_images.list)(
-                self.location,
-                self.capz_images_publisher,
-                offer,  # pyright: ignore
-                sku,  # pyright: ignore
-        )
-        prefix = self._capz_images_version_prefix()
+            self.compute_client.community_gallery_image_versions.list)(
+                location=self.location,
+                public_gallery_name=gallery_name,
+                gallery_image_name=image_name
+            )
+        prefix = self._capz_sig_gallery_version_prefix()
         vers = [i.name for i in img_vers if i.name.startswith(prefix)]
         vers.sort()
         return vers[-1]
@@ -841,19 +857,20 @@ class CapzFlannelCI(e2e_base.CI):
         )
         nodes = yaml.safe_load(nodes_yaml)  # pyright: ignore
 
-        expected_ver = self.kubernetes_version
+        expected_ver = f"v{self._capz_sig_gallery_version_prefix()}"
         for node in nodes["items"]:
             node_name = node["metadata"]["name"]
 
-            kubelet_ver = node["status"]["nodeInfo"]["kubeletVersion"]
-            if kubelet_ver != expected_ver:
+            kubelet_ver: str = node["status"]["nodeInfo"]["kubeletVersion"]
+            # relax the version match logic to within same minor version
+            if not kubelet_ver.startswith(expected_ver):
                 raise e2e_exceptions.VersionMismatch(
                     f"Wrong kubelet version on node {node_name}. "
                     f"Expected {expected_ver}, but found {kubelet_ver}")
 
-            kube_proxy_ver = node["status"]["nodeInfo"]["kubeProxyVersion"]
+            kube_proxy_ver: str = node["status"]["nodeInfo"]["kubeProxyVersion"]
             # Deprecated KubeProxy Version Reporting: https://github.com/kubernetes/kubernetes/commit/98c29f0312190904f55d62a4b4820fc17119ec10 
-            if kube_proxy_ver != "" and kube_proxy_ver != expected_ver:
+            if kube_proxy_ver != "" and not kube_proxy_ver.startswith(expected_ver):
                 raise e2e_exceptions.VersionMismatch(
                     f"Wrong kube-proxy version on node {node_name}. "
                     f"Expected {expected_ver}, but found {kube_proxy_ver}")
