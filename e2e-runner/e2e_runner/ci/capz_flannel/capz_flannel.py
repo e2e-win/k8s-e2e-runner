@@ -597,9 +597,9 @@ class CapzFlannelCI(e2e_base.CI):
         v = ver.strip("v").split(".")
         return f"{v[0]}{v[1]}.{v[2]}"
     
-    def _capz_sig_gallery_version_prefix(self):
+    def _capz_sig_gallery_version_prefix(self, is_node_setup = False):
         ver = self.kubernetes_version
-        if "k8sbins" in self.bins_built:
+        if "k8sbins" in self.bins_built and is_node_setup:
             ver = e2e_constants.DEFAULT_KUBERNETES_VERSION
         v = ver.strip("v").split(".")
         return f"{v[0]}.{v[1]}"
@@ -611,7 +611,7 @@ class CapzFlannelCI(e2e_base.CI):
                 public_gallery_name=gallery_name,
                 gallery_image_name=image_name
             )
-        prefix = self._capz_sig_gallery_version_prefix()
+        prefix = self._capz_sig_gallery_version_prefix(is_node_setup=True)
         vers = [i.name for i in img_vers if i.name.startswith(prefix)]
         vers.sort()
         return vers[-1]
