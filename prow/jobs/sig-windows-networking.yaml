@@ -1,6 +1,6 @@
 periodics:
 - name: k8s-e2e-ltsc2025-containerd-flannel-sdnbridge-master
-  cron: "0 2 */2 * *"
+  cron: "0 2 * * *"
   always_run: true
   labels:
     preset-github-readonly-token: "true"
@@ -26,7 +26,7 @@ periodics:
         - --cluster-name=capzctrd
 
 - name: k8s-e2e-ltsc2025-containerd-flannel-sdnoverlay-master
-  cron: "0 4 */2 * *"
+  cron: "0 4 * * *"
   always_run: true
   labels:
     preset-github-readonly-token: "true"
