@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 ARG CAPI_VERSION=v1.8.4
 ARG KUBECTL_VERSION=v1.30.6
@@ -16,7 +16,7 @@ RUN apt-get autoclean && \
 
 # Install Python dependencies
 ADD requirements.txt /tmp
-RUN pip3 install -r /tmp/requirements.txt && \
+RUN pip3 install -r /tmp/requirements.txt --break-system-packages && \
     rm /tmp/requirements.txt
 
 # Install clusterctl
@@ -27,7 +27,7 @@ RUN curl -Lo /usr/local/bin/clusterctl "https://github.com/kubernetes-sigs/clust
 RUN curl -Lo /usr/local/bin/kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
     chmod +x /usr/local/bin/kubectl && \
     mkdir ~/.kube
-ENV KUBECTL_PATH "/usr/local/bin/kubectl"
+ENV KUBECTL_PATH="/usr/local/bin/kubectl"
 
 # Install helm
 RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 && \
