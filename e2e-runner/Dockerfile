@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ubuntu:22.04
 
 ARG CAPI_VERSION=v1.8.4
 ARG KUBECTL_VERSION=v1.30.6
@@ -16,7 +16,7 @@ RUN apt-get autoclean && \
 
 # Install Python dependencies
 ADD requirements.txt /tmp
-RUN pip3 install -r /tmp/requirements.txt --break-system-packages && \
+RUN pip3 install -r /tmp/requirements.txt && \
     rm /tmp/requirements.txt
 
 # Install clusterctl
