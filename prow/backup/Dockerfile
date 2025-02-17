@@ -1,7 +1,7 @@
 FROM ubuntu:22.04
 
 # Corresponds to the Prow K8s environment
-ENV KUBECTL_VERSION=v1.28.3
+ENV KUBECTL_VERSION=v1.29.11
 
 # Install APT packages
 ENV DEBIAN_FRONTEND=noninteractive

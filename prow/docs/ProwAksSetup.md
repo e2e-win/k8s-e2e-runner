@@ -10,7 +10,7 @@ az aks create \
     --vm-set-type VirtualMachineScaleSets \
     --node-vm-size Standard_D2_v4 \
     --node-osdisk-size 256 \
-    --kubernetes-version 1.28.3 \
+    --kubernetes-version 1.29.11 \
     --tags "DO-NOT-DELETE=contact SIG-Windows" \
     --yes
 ```
