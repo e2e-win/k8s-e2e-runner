@@ -8,8 +8,6 @@ spec:
   kubeadmConfigSpec:
     clusterConfiguration:
       apiServer:
-        extraArgs:
-          cloud-provider: external
         timeoutForControlPlane: 20m
       controllerManager:
         extraArgs:
