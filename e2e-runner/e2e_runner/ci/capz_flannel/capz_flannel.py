@@ -998,7 +998,7 @@ class CapzFlannelCI(e2e_base.CI):
         self.logging.info("Building containerd binaries")
         self.bootstrap_vm.exec(
             script=[
-                "VERSION=1.7.0+unknown GOOS=windows make binaries",  # noqa: TODO(ibalutoiu): This hard-coded version needs to be removed once containerd v1.7.0 gets released.
+                "GOOS=windows make binaries",
                 "GOOS=windows make -f Makefile.windows bin/containerd-shim-runhcs-v1.exe",  # noqa:
                 "sudo GOOS=windows GOPATH=$HOME/go DESTDIR=$(pwd)/bin/cri-tools ./script/setup/install-critools",  # noqa:
             ],
