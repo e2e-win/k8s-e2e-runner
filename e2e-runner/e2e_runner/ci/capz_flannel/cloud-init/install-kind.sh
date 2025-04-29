@@ -3,7 +3,7 @@ set -o nounset
 set -o pipefail
 set -o errexit
 
-KIND_BIN_URL="https://github.com/kubernetes-sigs/kind/releases/download/v0.20.0/kind-linux-amd64"
+KIND_BIN_URL="https://github.com/kubernetes-sigs/kind/releases/download/v0.27.0/kind-linux-amd64"
 
 sudo curl -s -L -o /usr/local/bin/kind $KIND_BIN_URL
 sudo chmod +x /usr/local/bin/kind
